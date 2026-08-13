@@ -3,4 +3,8 @@ set -e
 
 alembic upgrade head
 
+echo ""
+echo "==> Backend MAIA disponivel em: http://localhost:8000"
+echo ""
+
 exec uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
