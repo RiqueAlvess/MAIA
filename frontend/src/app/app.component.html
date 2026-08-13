@@ -1,0 +1,77 @@
+<mat-sidenav-container class="app-shell">
+  <mat-sidenav
+    class="app-sidenav"
+    [mode]="sidenavMode()"
+    [opened]="sidenavOpened()"
+    (openedChange)="sidenavOpened.set($event)"
+  >
+    <div class="brand">
+      <span class="brand-mark">
+        <span class="dot dot--sm"></span>
+        <span class="dot dot--md"></span>
+        <span class="dot dot--lg"></span>
+      </span>
+      <div class="brand-text">
+        <strong>MAIA</strong>
+        <span>LG Consult</span>
+      </div>
+    </div>
+
+    <mat-nav-list class="nav-list">
+      @for (link of navLinks; track link.path) {
+        <a mat-list-item class="nav-item" [routerLink]="link.path" routerLinkActive="nav-item--active">
+          <mat-icon matListItemIcon>{{ link.icon }}</mat-icon>
+          <span matListItemTitle>{{ link.label }}</span>
+        </a>
+      }
+    </mat-nav-list>
+
+    <div class="sidenav-footer">
+      @if (authConfigured) {
+        @if (contaAtiva) {
+          <div class="account-chip">
+            <div class="avatar-initials">{{ (contaAtiva.name || contaAtiva.username).charAt(0) }}</div>
+            <div class="account-info">
+              <span class="account-name">{{ contaAtiva.name || contaAtiva.username }}</span>
+              <button mat-button class="account-logout" (click)="sair()">Sair</button>
+            </div>
+          </div>
+        }
+      } @else {
+        <div class="dev-badge">
+          <mat-icon>construction</mat-icon>
+          <div>
+            <strong>Modo desenvolvimento</strong>
+            <span>Autenticação desativada</span>
+          </div>
+        </div>
+      }
+    </div>
+  </mat-sidenav>
+
+  <mat-sidenav-content class="app-content">
+    <header class="topbar">
+      @if (isMobile()) {
+        <button mat-icon-button (click)="toggleSidenav()" aria-label="Abrir menu">
+          <mat-icon>menu</mat-icon>
+        </button>
+      }
+      <nav class="breadcrumbs" aria-label="Trilha de navegação">
+        @for (crumb of breadcrumbs(); track trackByBreadcrumb($index, crumb); let last = $last) {
+          @if (crumb.link && !last) {
+            <a [routerLink]="crumb.link">{{ crumb.label }}</a>
+          } @else {
+            <span class="breadcrumbs-current">{{ crumb.label }}</span>
+          }
+          @if (!last) {
+            <mat-icon class="breadcrumbs-separator">chevron_right</mat-icon>
+          }
+        }
+      </nav>
+    </header>
+
+    <main class="app-main">
+      <router-outlet></router-outlet>
+    </main>
+  </mat-sidenav-content>
+</mat-sidenav-container>

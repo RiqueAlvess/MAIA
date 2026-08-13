@@ -1,0 +1,34 @@
+<div class="dialog-header">
+  <h2 mat-dialog-title>Novo cliente</h2>
+  <button mat-icon-button (click)="cancelar()" aria-label="Fechar">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
+
+<div mat-dialog-content class="dialog-content">
+  <mat-form-field appearance="outline">
+    <mat-label>Nome do cliente</mat-label>
+    <input matInput [(ngModel)]="nome" name="nome" placeholder="Ex.: Banco Exemplo S.A." />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>ID da pasta no SharePoint</mat-label>
+    <input matInput [(ngModel)]="pastaSharepointId" name="pastaSharepointId" placeholder="Ex.: 01ABCXYZ..." />
+    <mat-hint>Identificador do item de pasta no Microsoft Graph, não o caminho local.</mat-hint>
+  </mat-form-field>
+
+  @if (erro()) {
+    <p class="dialog-error">{{ erro() }}</p>
+  }
+</div>
+
+<div mat-dialog-actions class="dialog-actions">
+  <button mat-button (click)="cancelar()">Cancelar</button>
+  <button mat-flat-button color="primary" [disabled]="formInvalido || salvando()" (click)="salvar()">
+    @if (salvando()) {
+      Salvando…
+    } @else {
+      Adicionar cliente
+    }
+  </button>
+</div>

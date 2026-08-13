@@ -14,19 +14,27 @@ class GraphStorageProvider:
     """Storage provider baseado no Microsoft Graph API (SharePoint/OneDrive), autenticação app-only."""
 
     def __init__(self, settings: Settings):
+        self._settings = settings
         self._site_id = settings.ms_graph_site_id
-        self._app = msal.ConfidentialClientApplication(
-            client_id=settings.ms_graph_client_id,
-            client_credential=settings.ms_graph_client_secret,
-            authority=f"https://login.microsoftonline.com/{settings.ms_graph_tenant_id}",
-        )
+        self._app: msal.ConfidentialClientApplication | None = None
         self._token: str | None = None
         self._token_expira_em: float = 0.0
+
+    def _obter_app(self) -> msal.ConfidentialClientApplication:
+        if not self._settings.graph_configurado:
+            raise RuntimeError("Microsoft Graph não configurado (MS_GRAPH_TENANT_ID/CLIENT_ID/CLIENT_SECRET)")
+        if self._app is None:
+            self._app = msal.ConfidentialClientApplication(
+                client_id=self._settings.ms_graph_client_id,
+                client_credential=self._settings.ms_graph_client_secret,
+                authority=f"https://login.microsoftonline.com/{self._settings.ms_graph_tenant_id}",
+            )
+        return self._app
 
     async def _obter_token(self) -> str:
         if self._token and time.time() < self._token_expira_em - 60:
             return self._token
-        resultado = self._app.acquire_token_for_client(scopes=["https://graph.microsoft.com/.default"])
+        resultado = self._obter_app().acquire_token_for_client(scopes=["https://graph.microsoft.com/.default"])
         if "access_token" not in resultado:
             detalhe = resultado.get("error_description", resultado)
             raise RuntimeError(f"Falha ao autenticar no Microsoft Graph: {detalhe}")

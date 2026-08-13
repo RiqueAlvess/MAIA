@@ -1,29 +1,64 @@
-<div class="maia-page">
-  <h1>Central de Entregáveis</h1>
+<div class="page">
+  <div class="page-heading">
+    <div>
+      <a [routerLink]="['/clientes', clienteId, 'processos']" class="back-link">
+        <mat-icon>arrow_back</mat-icon>
+        Processos
+      </a>
+      <h1>Entregáveis</h1>
+      <p>Gere os entregáveis do processo {{ processo?.nome }} a partir dos documentos da camada Bronze.</p>
+    </div>
+  </div>
 
-  <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px">
+  <div class="card-grid">
     @for (item of tipos; track item.tipo) {
-      <mat-card>
-        <mat-card-title>{{ item.rotulo }}</mat-card-title>
-        <mat-card-content>
-          @if (jobDoTipo(item.tipo); as job) {
-            <mat-chip-set>
-              <mat-chip>{{ job.status }}</mat-chip>
-            </mat-chip-set>
-            @if (emAndamento(item.tipo)) {
-              <mat-progress-bar mode="indeterminate" style="margin-top: 8px"></mat-progress-bar>
-            }
-            @if (job.status === 'erro') {
-              <p style="color: #b3261e">{{ job.log }}</p>
-            }
+      <div class="surface-card entregavel-card">
+        <div class="entregavel-card-icon">
+          <mat-icon>{{ item.icon }}</mat-icon>
+        </div>
+
+        <strong class="entregavel-card-title">{{ item.rotulo }}</strong>
+        <p class="entregavel-card-description">{{ item.descricao }}</p>
+
+        @if (jobDoTipo(item.tipo); as job) {
+          <div
+            class="status-chip entregavel-card-status"
+            [class.status-chip--info]="job.status === 'processando'"
+            [class.status-chip--neutral]="job.status === 'pendente'"
+            [class.status-chip--success]="job.status === 'concluido'"
+            [class.status-chip--danger]="job.status === 'erro'"
+          >
+            {{ rotuloStatus[job.status] }}
+          </div>
+
+          @if (job.status === 'erro') {
+            <p class="entregavel-card-error">{{ job.log }}</p>
           }
-        </mat-card-content>
-        <mat-card-actions>
-          <button mat-flat-button color="primary" [disabled]="emAndamento(item.tipo)" (click)="gerar(item.tipo)">
-            Gerar
-          </button>
-        </mat-card-actions>
-      </mat-card>
+        }
+
+        <button
+          mat-stroked-button
+          color="primary"
+          class="entregavel-card-action"
+          [disabled]="emAndamento(item.tipo)"
+          (click)="gerar(item.tipo)"
+        >
+          @if (emAndamento(item.tipo)) {
+            <mat-spinner diameter="18" class="entregavel-card-spinner"></mat-spinner>
+            Gerando…
+          } @else if (jobDoTipo(item.tipo)?.status === 'concluido') {
+            <ng-container>
+              <mat-icon>refresh</mat-icon>
+              Gerar novamente
+            </ng-container>
+          } @else {
+            <ng-container>
+              <mat-icon>auto_awesome</mat-icon>
+              Gerar
+            </ng-container>
+          }
+        </button>
+      </div>
     }
   </div>
 </div>

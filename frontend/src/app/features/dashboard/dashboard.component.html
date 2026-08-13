@@ -1,13 +1,84 @@
-<div class="maia-page">
-  <h1>Dashboard</h1>
+<div class="page">
+  <div class="page-heading">
+    <div>
+      <h1>Visão geral</h1>
+      <p>Acompanhe clientes, processos e entregáveis mapeados pela consultoria.</p>
+    </div>
+    <a mat-flat-button color="primary" routerLink="/clientes">
+      <mat-icon>add</mat-icon>
+      Novo cliente
+    </a>
+  </div>
 
-  <mat-card>
-    <mat-card-title>Clientes ativos</mat-card-title>
-    <mat-card-content>
-      <p>{{ clientes().length }} cliente(s) cadastrado(s).</p>
-    </mat-card-content>
-    <mat-card-actions>
-      <a mat-button color="primary" routerLink="/clientes">Gerenciar clientes</a>
-    </mat-card-actions>
-  </mat-card>
+  <div class="stat-grid">
+    <div class="surface-card stat-card">
+      <span class="stat-card-icon stat-card-icon--brand">
+        <mat-icon>groups</mat-icon>
+      </span>
+      <div>
+        <span class="stat-card-value">{{ clientes().length }}</span>
+        <span class="stat-card-label">Clientes cadastrados</span>
+      </div>
+    </div>
+
+    <div class="surface-card stat-card">
+      <span class="stat-card-icon stat-card-icon--success">
+        <mat-icon>description</mat-icon>
+      </span>
+      <div>
+        <span class="stat-card-value">{{ tiposEntregavelCount }}</span>
+        <span class="stat-card-label">Tipos de entregável suportados</span>
+      </div>
+    </div>
+
+    <div class="surface-card stat-card">
+      <span class="stat-card-icon" [class.stat-card-icon--warning]="!authConfigured" [class.stat-card-icon--brand]="authConfigured">
+        <mat-icon>{{ authConfigured ? 'verified_user' : 'construction' }}</mat-icon>
+      </span>
+      <div>
+        <span class="stat-card-value stat-card-value--sm">{{ authConfigured ? 'Produção' : 'Desenvolvimento' }}</span>
+        <span class="stat-card-label">Ambiente de autenticação</span>
+      </div>
+    </div>
+  </div>
+
+  <section class="section">
+    <div class="section-heading">
+      <h2 class="section-title">Clientes recentes</h2>
+      @if (clientes().length > 0) {
+        <a routerLink="/clientes" class="section-link">
+          Ver todos
+          <mat-icon>arrow_forward</mat-icon>
+        </a>
+      }
+    </div>
+
+    @if (carregando()) {
+      <div class="card-grid">
+        @for (i of [1, 2, 3]; track i) {
+          <div class="surface-card skeleton-card"></div>
+        }
+      </div>
+    } @else if (clientes().length === 0) {
+      <div class="empty-state">
+        <mat-icon>domain_add</mat-icon>
+        <h3>Nenhum cliente cadastrado ainda</h3>
+        <p>Cadastre o primeiro cliente para começar a mapear processos e gerar entregáveis.</p>
+        <a mat-flat-button color="primary" routerLink="/clientes">Cadastrar cliente</a>
+      </div>
+    } @else {
+      <div class="card-grid">
+        @for (cliente of clientesRecentes(); track cliente.id) {
+          <a class="surface-card surface-card--interactive cliente-card" [routerLink]="['/clientes', cliente.id, 'processos']">
+            <div class="avatar-initials">{{ iniciais(cliente.nome) }}</div>
+            <div class="cliente-card-info">
+              <strong>{{ cliente.nome }}</strong>
+              <span>Cadastrado em {{ cliente.criado_em | date: 'dd/MM/yyyy' }}</span>
+            </div>
+            <mat-icon class="cliente-card-arrow">chevron_right</mat-icon>
+          </a>
+        }
+      </div>
+    }
+  </section>
 </div>

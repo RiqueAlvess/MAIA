@@ -3,13 +3,16 @@ import { Component, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatTableModule } from '@angular/material/table';
 
-import { ClienteApiService } from '../../core/api/services/cliente.service';
 import { ClienteRead } from '../../core/api/models/cliente.model';
+import { ClienteApiService } from '../../core/api/services/cliente.service';
+import { PageHeaderService } from '../../core/layout/page-header.service';
+import { DIALOG_WIDTH } from '../../shared/dialog-config';
+import { ClienteFormDialogComponent } from './cliente-form-dialog.component';
 
 @Component({
   selector: 'maia-clientes-list',
@@ -19,51 +22,59 @@ import { ClienteRead } from '../../core/api/models/cliente.model';
     FormsModule,
     RouterLink,
     MatButtonModule,
-    MatCardModule,
+    MatDialogModule,
     MatFormFieldModule,
+    MatIconModule,
     MatInputModule,
-    MatTableModule,
   ],
   templateUrl: './clientes-list.component.html',
+  styleUrl: './clientes-list.component.scss',
 })
 export class ClientesListComponent implements OnInit {
   clientes = signal<ClienteRead[]>([]);
-  colunas = ['nome', 'pasta_sharepoint_id', 'criado_em', 'acoes'];
+  carregando = signal(true);
+  busca = signal('');
 
-  novoNome = '';
-  novaPastaSharepointId = '';
-  salvando = false;
-  erro: string | null = null;
-
-  constructor(private readonly clienteApi: ClienteApiService) {}
+  constructor(
+    private readonly clienteApi: ClienteApiService,
+    private readonly dialog: MatDialog,
+    private readonly pageHeader: PageHeaderService,
+  ) {}
 
   ngOnInit(): void {
+    this.pageHeader.set([{ label: 'Clientes' }]);
     this.carregar();
   }
 
   carregar(): void {
-    this.clienteApi.listar().subscribe((clientes) => this.clientes.set(clientes));
+    this.carregando.set(true);
+    this.clienteApi.listar().subscribe((clientes) => {
+      this.clientes.set(clientes);
+      this.carregando.set(false);
+    });
   }
 
-  criar(): void {
-    if (!this.novoNome.trim() || !this.novaPastaSharepointId.trim()) {
-      return;
+  clientesFiltrados(): ClienteRead[] {
+    const termo = this.busca().trim().toLowerCase();
+    if (!termo) {
+      return this.clientes();
     }
-    this.salvando = true;
-    this.erro = null;
-    this.clienteApi
-      .criar({ nome: this.novoNome.trim(), pasta_sharepoint_id: this.novaPastaSharepointId.trim() })
-      .subscribe({
-        next: () => {
-          this.novoNome = '';
-          this.novaPastaSharepointId = '';
-          this.salvando = false;
-          this.carregar();
-        },
-        error: () => {
-          this.erro = 'Não foi possível criar o cliente.';
-          this.salvando = false;
-        },
-      });
+    return this.clientes().filter((cliente) => cliente.nome.toLowerCase().includes(termo));
+  }
+
+  iniciais(nome: string): string {
+    return nome.charAt(0).toUpperCase();
+  }
+
+  abrirFormulario(): void {
+    const dialogRef = this.dialog.open(ClienteFormDialogComponent, {
+      autoFocus: 'first-tabbable',
+      width: DIALOG_WIDTH,
+    });
+    dialogRef.afterClosed().subscribe((clienteCriado) => {
+      if (clienteCriado) {
+        this.clientes.update((atual) => [clienteCriado, ...atual]);
+      }
+    });
   }
 }

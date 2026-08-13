@@ -1,5 +1,6 @@
 import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { ApplicationConfig, importProvidersFrom } from '@angular/core';
+import { MAT_ICON_DEFAULT_OPTIONS } from '@angular/material/icon';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideRouter } from '@angular/router';
 import {
@@ -26,6 +27,7 @@ export const appConfig: ApplicationConfig = {
     { provide: MSAL_GUARD_CONFIG, useFactory: msalGuardConfigFactory },
     { provide: MSAL_INTERCEPTOR_CONFIG, useFactory: msalInterceptorConfigFactory },
     { provide: HTTP_INTERCEPTORS, useClass: MsalInterceptor, multi: true },
+    { provide: MAT_ICON_DEFAULT_OPTIONS, useValue: { fontSet: 'material-icons-round' } },
     MsalService,
     MsalGuard,
     MsalBroadcastService,
