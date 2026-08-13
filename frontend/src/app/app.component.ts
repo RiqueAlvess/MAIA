@@ -46,6 +46,9 @@ export class AppComponent implements OnInit {
   readonly navLinks = [
     { path: '/dashboard', label: 'Dashboard', icon: 'space_dashboard' },
     { path: '/clientes', label: 'Clientes', icon: 'groups' },
+    { path: '/processos', label: 'Processos', icon: 'account_tree' },
+    { path: '/relatorios', label: 'Relatórios', icon: 'summarize' },
+    { path: '/configuracoes', label: 'Configurações', icon: 'settings' },
   ];
 
   constructor(

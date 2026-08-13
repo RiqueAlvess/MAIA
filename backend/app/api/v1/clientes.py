@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.api.v1.deps import get_cliente_service
 from app.core.security import get_current_user
-from app.domain.schemas import ClienteCreate, ClienteRead
+from app.domain.schemas import ClienteAtualizarDestinatarios, ClienteCreate, ClienteRead
 from app.services.cliente_service import ClienteService
 
 router = APIRouter(prefix="/clientes", tags=["clientes"], dependencies=[Depends(get_current_user)])
@@ -34,6 +34,18 @@ async def obter_cliente(
     service: Annotated[ClienteService, Depends(get_cliente_service)],
 ) -> ClienteRead:
     cliente = await service.obter(cliente_id)
+    if cliente is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Cliente não encontrado")
+    return ClienteRead.model_validate(cliente)
+
+
+@router.patch("/{cliente_id}/destinatarios", response_model=ClienteRead)
+async def atualizar_destinatarios(
+    cliente_id: uuid.UUID,
+    dados: ClienteAtualizarDestinatarios,
+    service: Annotated[ClienteService, Depends(get_cliente_service)],
+) -> ClienteRead:
+    cliente = await service.atualizar_destinatarios(cliente_id, dados.destinatarios_relatorio)
     if cliente is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Cliente não encontrado")
     return ClienteRead.model_validate(cliente)

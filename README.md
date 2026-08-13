@@ -45,6 +45,7 @@ Para habilitar as integrações:
 2. Preencha `backend/.env` com:
    - `ANTHROPIC_API_KEY` — chave da API Claude (console.anthropic.com).
    - `MS_GRAPH_TENANT_ID`, `MS_GRAPH_CLIENT_ID`, `MS_GRAPH_CLIENT_SECRET`, `MS_GRAPH_SITE_ID` — credenciais de aplicativo (client credentials) registradas no Entra ID com permissão `Sites.ReadWrite.All` (app-only) sobre o site do SharePoint.
+   - `MS_GRAPH_SENDER_UPN` — caixa de correio remetente do envio de relatórios por e-mail (`POST /relatorios/enviar-email`), via Microsoft Graph. Requer a permissão de aplicativo `Mail.Send` (com consentimento de admin) no mesmo app registration acima.
    - `ENTRA_TENANT_ID`, `ENTRA_AUDIENCE` — validação de token dos usuários do painel (App Registration do frontend).
 3. Preencha `frontend/src/environments/environment.ts` (`auth.clientId`, `auth.tenantId`) com os dados da App Registration do frontend.
 
@@ -56,6 +57,7 @@ A aplicação foi pensada para subir e ser navegável antes de qualquer credenci
 
 - **`ANTHROPIC_API_KEY`** ausente — a geração de entregáveis retorna erro explícito só quando acionada; o resto da aplicação funciona normalmente.
 - **`MS_GRAPH_*`** ausente — mesma lógica: só falha quando um entregável tenta ser salvo no SharePoint.
+- **`MS_GRAPH_SENDER_UPN`** ausente — o envio de relatório por e-mail (tela Relatórios) retorna `503` só quando acionado; navegar e consultar o histórico continuam funcionando normalmente.
 - **Login (Entra ID)** — controlado por `ENVIRONMENT` (`backend/.env`, padrão `development`):
   - `ENVIRONMENT=development` (padrão) **e** `ENTRA_TENANT_ID`/`ENTRA_AUDIENCE` ausentes → a API libera as rotas sem exigir token, e o frontend não tenta redirecionar para o login da Microsoft (isso é o que faz `docker compose up` funcionar sem nenhum `.env`). Basta não preencher `auth.clientId`/`auth.tenantId` em `frontend/src/environments/environment.ts`.
   - `ENVIRONMENT=production` → o backend **exige** `ENTRA_TENANT_ID`/`ENTRA_AUDIENCE` configurados (responde `503` até serem definidos) e passa a validar token em toda rota. Configure também `auth.clientId`/`auth.tenantId` no frontend para o login funcionar — sem isso a build de produção também bloqueia a navegação.
@@ -147,10 +149,22 @@ alembic revision -m "descricao"   # cria uma nova migration manual
 
 ## Modelo de dados
 
-- `clientes` — id, nome, pasta_sharepoint_id (referência ao Graph, não path local)
+- `clientes` — id, nome, pasta_sharepoint_id (referência ao Graph, não path local), destinatarios_relatorio
 - `processos` — id, cliente_id, nome, status_as_is, status_to_be
 - `documentos` — id, processo_id, nome, graph_item_id, camada (bronze/as_is/to_be), tamanho_kb
 - `entregaveis` — id, processo_id, tipo, graph_item_id, gerado_em
 - `jobs_geracao` — id, entregavel_id, status (pendente/processando/concluido/erro), log
 
 O estado de um processo é sempre uma consulta SQL — nunca uma varredura de filesystem.
+
+## Navegação
+
+| Tela | O que mostra |
+|---|---|
+| Dashboard | Visão geral: contagem de clientes, tipos de entregável suportados, ambiente de autenticação |
+| Clientes | Cadastro de clientes e acesso aos processos de cada um |
+| Processos | Todos os processos mapeados, de todos os clientes, com status AS IS/TO BE |
+| Relatórios | Histórico consolidado de entregáveis gerados (todos os clientes), com filtro por cliente/tipo e envio por e-mail |
+| Configurações | Status real das integrações (IA, Graph, autenticação, e-mail) e destinatários padrão de relatório por cliente |
+
+Cada processo tem sua própria Central de Entregáveis (acessível a partir de Clientes ou Processos) com os 7 tipos suportados: AS IS, Gaps, TO BE, Matriz RACI, Dashboard de Maturidade, Status Semanal e Pauta de Reunião.

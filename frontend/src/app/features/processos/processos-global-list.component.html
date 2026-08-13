@@ -1,0 +1,62 @@
+<div class="page">
+  <div class="page-heading">
+    <div>
+      <h1>Processos</h1>
+      <p>Todos os processos mapeados, em todos os clientes.</p>
+    </div>
+  </div>
+
+  @if (processos().length > 0) {
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-icon matPrefix>search</mat-icon>
+      <input
+        matInput
+        [ngModel]="busca()"
+        (ngModelChange)="busca.set($event)"
+        placeholder="Buscar por processo ou cliente"
+      />
+    </mat-form-field>
+  }
+
+  @if (carregando()) {
+    <div class="card-grid">
+      @for (i of [1, 2, 3, 4]; track i) {
+        <div class="surface-card skeleton-card"></div>
+      }
+    </div>
+  } @else if (processos().length === 0) {
+    <div class="empty-state">
+      <mat-icon>fact_check</mat-icon>
+      <h3>Nenhum processo mapeado ainda</h3>
+      <p>Cadastre um cliente e um processo para começar.</p>
+      <a mat-flat-button color="primary" routerLink="/clientes">Ir para Clientes</a>
+    </div>
+  } @else if (processosFiltrados().length === 0) {
+    <div class="empty-state">
+      <mat-icon>search_off</mat-icon>
+      <h3>Nenhum resultado para "{{ busca() }}"</h3>
+      <p>Tente buscar por outro termo.</p>
+    </div>
+  } @else {
+    <div class="card-grid">
+      @for (processo of processosFiltrados(); track processo.id) {
+        <a class="surface-card surface-card--interactive processo-card" [routerLink]="['/processos', processo.id, 'entregaveis']">
+          <span class="processo-card-cliente">{{ processo.cliente_nome }}</span>
+          <strong class="processo-card-name">{{ processo.nome }}</strong>
+          <div class="processo-card-status">
+            <span class="status-chip" [ngClass]="statusChipClass(processo.status_as_is)">
+              AS IS · {{ formatarStatus(processo.status_as_is) }}
+            </span>
+            <span class="status-chip" [ngClass]="statusChipClass(processo.status_to_be)">
+              TO BE · {{ formatarStatus(processo.status_to_be) }}
+            </span>
+          </div>
+          <span class="processo-card-footer">
+            Ver entregáveis
+            <mat-icon>arrow_forward</mat-icon>
+          </span>
+        </a>
+      }
+    </div>
+  }
+</div>

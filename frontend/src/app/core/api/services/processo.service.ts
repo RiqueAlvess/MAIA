@@ -16,6 +16,10 @@ export class ProcessoApiService {
     return this.http.get<ProcessoRead[]>(this.baseUrl, { params });
   }
 
+  listarTodos(): Observable<ProcessoRead[]> {
+    return this.http.get<ProcessoRead[]>(this.baseUrl);
+  }
+
   obter(processoId: string): Observable<ProcessoRead> {
     return this.http.get<ProcessoRead>(`${this.baseUrl}/${processoId}`);
   }

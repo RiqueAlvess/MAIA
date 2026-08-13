@@ -24,6 +24,10 @@ class ProcessoRepository:
         resultado = await self._session.exec(consulta)
         return list(resultado.all())
 
+    async def listar_todos(self) -> list[Processo]:
+        resultado = await self._session.exec(select(Processo).order_by(Processo.nome))
+        return list(resultado.all())
+
     async def atualizar(self, processo: Processo) -> Processo:
         self._session.add(processo)
         await self._session.commit()

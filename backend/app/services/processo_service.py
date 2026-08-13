@@ -18,3 +18,6 @@ class ProcessoService:
 
     async def listar_por_cliente(self, cliente_id: uuid.UUID) -> list[Processo]:
         return await self._repo.listar_por_cliente(cliente_id)
+
+    async def listar_todos(self) -> list[Processo]:
+        return await self._repo.listar_todos()

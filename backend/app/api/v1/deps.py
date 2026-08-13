@@ -6,6 +6,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from app.core.config import Settings, get_settings
 from app.db.session import get_session
 from app.providers.ai.claude_provider import ClaudeProvider
+from app.providers.email.graph_email import GraphEmailProvider
 from app.providers.storage.graph_storage import GraphStorageProvider
 from app.repositories.cliente_repo import ClienteRepository
 from app.repositories.documento_repo import DocumentoRepository
@@ -14,6 +15,7 @@ from app.repositories.processo_repo import ProcessoRepository
 from app.services.cliente_service import ClienteService
 from app.services.entregavel_service import EntregavelService
 from app.services.processo_service import ProcessoService
+from app.services.relatorio_service import RelatorioService
 
 SessionDep = Annotated[AsyncSession, Depends(get_session)]
 SettingsDep = Annotated[Settings, Depends(get_settings)]
@@ -43,6 +45,10 @@ def get_ai_provider(settings: SettingsDep) -> ClaudeProvider:
     return ClaudeProvider(settings)
 
 
+def get_email_provider(settings: SettingsDep) -> GraphEmailProvider:
+    return GraphEmailProvider(settings)
+
+
 def get_cliente_service(repo: Annotated[ClienteRepository, Depends(get_cliente_repo)]) -> ClienteService:
     return ClienteService(repo)
 
@@ -60,3 +66,11 @@ def get_entregavel_service(
     ai: Annotated[ClaudeProvider, Depends(get_ai_provider)],
 ) -> EntregavelService:
     return EntregavelService(entregavel_repo, processo_repo, cliente_repo, documento_repo, storage, ai)
+
+
+def get_relatorio_service(
+    entregavel_repo: Annotated[EntregavelRepository, Depends(get_entregavel_repo)],
+    cliente_repo: Annotated[ClienteRepository, Depends(get_cliente_repo)],
+    email: Annotated[GraphEmailProvider, Depends(get_email_provider)],
+) -> RelatorioService:
+    return RelatorioService(entregavel_repo, cliente_repo, email)

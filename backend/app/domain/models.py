@@ -34,6 +34,7 @@ class Cliente(SQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     nome: str = Field(index=True, max_length=200)
     pasta_sharepoint_id: str = Field(max_length=500)
+    destinatarios_relatorio: str = Field(default="", max_length=1000)
     criado_em: datetime = Field(default_factory=datetime.utcnow)
 
     processos: list["Processo"] = Relationship(back_populates="cliente")

@@ -10,4 +10,5 @@ export interface ProcessoRead {
   status_as_is: string;
   status_to_be: string;
   criado_em: string;
+  cliente_nome: string | null;
 }

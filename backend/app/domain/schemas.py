@@ -17,7 +17,12 @@ class ClienteRead(BaseModel):
     id: uuid.UUID
     nome: str
     pasta_sharepoint_id: str
+    destinatarios_relatorio: str
     criado_em: datetime
+
+
+class ClienteAtualizarDestinatarios(BaseModel):
+    destinatarios_relatorio: str = Field(default="", max_length=1000)
 
 
 class ProcessoCreate(BaseModel):
@@ -34,6 +39,7 @@ class ProcessoRead(BaseModel):
     status_as_is: str
     status_to_be: str
     criado_em: datetime
+    cliente_nome: str | None = None
 
 
 class DocumentoRead(BaseModel):
@@ -69,3 +75,29 @@ class JobGeracaoRead(BaseModel):
     log: str
     criado_em: datetime
     atualizado_em: datetime
+
+
+class EntregavelHistoricoRead(BaseModel):
+    id: uuid.UUID
+    tipo: TipoEntregavel
+    processo_id: uuid.UUID
+    processo_nome: str
+    cliente_id: uuid.UUID
+    cliente_nome: str
+    gerado_em: datetime | None
+    status: StatusJob | None
+    status_log: str
+
+
+class RelatorioEmailRequest(BaseModel):
+    cliente_id: uuid.UUID
+    processo_id: uuid.UUID | None = None
+    destinatarios: list[str] | None = None
+
+
+class StatusIntegracoesRead(BaseModel):
+    ambiente: str
+    ai_configurado: bool
+    graph_configurado: bool
+    auth_configurado: bool
+    email_configurado: bool

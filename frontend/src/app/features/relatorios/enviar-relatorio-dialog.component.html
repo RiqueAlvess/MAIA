@@ -1,0 +1,31 @@
+<div class="dialog-header">
+  <h2 mat-dialog-title>Enviar relatório por e-mail</h2>
+  <button mat-icon-button (click)="cancelar()" aria-label="Fechar">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
+
+<div mat-dialog-content class="dialog-content">
+  <p class="dialog-hint">Resumo dos entregáveis de: <strong>{{ data.clienteNome }}</strong></p>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Destinatários</mat-label>
+    <input matInput [(ngModel)]="destinatarios" name="destinatarios" placeholder="nome@empresa.com, outro@empresa.com" />
+    <mat-hint>Separe múltiplos endereços por vírgula.</mat-hint>
+  </mat-form-field>
+
+  @if (erro()) {
+    <p class="dialog-error">{{ erro() }}</p>
+  }
+</div>
+
+<div mat-dialog-actions class="dialog-actions">
+  <button mat-button (click)="cancelar()">Cancelar</button>
+  <button mat-flat-button color="primary" [disabled]="formInvalido || enviando()" (click)="enviar()">
+    @if (enviando()) {
+      Enviando…
+    } @else {
+      Enviar
+    }
+  </button>
+</div>

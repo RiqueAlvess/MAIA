@@ -1,0 +1,95 @@
+<div class="page">
+  <div class="page-heading">
+    <div>
+      <h1>Configurações</h1>
+      <p>Status das integrações do ambiente e destinatários padrão de relatórios por cliente.</p>
+    </div>
+  </div>
+
+  <section class="section">
+    <h2 class="section-title">Integrações</h2>
+    @if (status(); as s) {
+      <div class="stat-grid">
+        <div class="surface-card status-card">
+          <div class="status-card-top">
+            <mat-icon>psychology</mat-icon>
+            <span class="status-chip" [ngClass]="s.ai_configurado ? 'status-chip--success' : 'status-chip--neutral'">
+              {{ s.ai_configurado ? 'Configurado' : 'Não configurado' }}
+            </span>
+          </div>
+          <strong>Geração de conteúdo (Claude)</strong>
+          <span class="status-card-desc">ANTHROPIC_API_KEY</span>
+        </div>
+
+        <div class="surface-card status-card">
+          <div class="status-card-top">
+            <mat-icon>cloud</mat-icon>
+            <span class="status-chip" [ngClass]="s.graph_configurado ? 'status-chip--success' : 'status-chip--neutral'">
+              {{ s.graph_configurado ? 'Configurado' : 'Não configurado' }}
+            </span>
+          </div>
+          <strong>Armazenamento (Microsoft Graph)</strong>
+          <span class="status-card-desc">MS_GRAPH_TENANT_ID / CLIENT_ID / CLIENT_SECRET</span>
+        </div>
+
+        <div class="surface-card status-card">
+          <div class="status-card-top">
+            <mat-icon>verified_user</mat-icon>
+            <span class="status-chip" [ngClass]="s.auth_configurado ? 'status-chip--success' : 'status-chip--neutral'">
+              {{ s.auth_configurado ? 'Configurado' : 'Modo desenvolvimento' }}
+            </span>
+          </div>
+          <strong>Autenticação (Entra ID)</strong>
+          <span class="status-card-desc">ENTRA_TENANT_ID / ENTRA_AUDIENCE</span>
+        </div>
+
+        <div class="surface-card status-card">
+          <div class="status-card-top">
+            <mat-icon>mail</mat-icon>
+            <span class="status-chip" [ngClass]="s.email_configurado ? 'status-chip--success' : 'status-chip--neutral'">
+              {{ s.email_configurado ? 'Configurado' : 'Não configurado' }}
+            </span>
+          </div>
+          <strong>Envio de relatórios (e-mail)</strong>
+          <span class="status-card-desc">MS_GRAPH_SENDER_UPN + Graph</span>
+        </div>
+      </div>
+    }
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Destinatários padrão de relatório</h2>
+    <p class="section-hint">
+      Usados como sugestão ao enviar o relatório de um cliente por e-mail em <strong>Relatórios</strong>.
+    </p>
+
+    @if (carregando()) {
+      <div class="surface-card skeleton-block"></div>
+    } @else if (linhas().length === 0) {
+      <div class="empty-state">
+        <mat-icon>groups</mat-icon>
+        <h3>Nenhum cliente cadastrado</h3>
+        <p>Cadastre clientes na tela de Clientes para configurar destinatários.</p>
+      </div>
+    } @else {
+      <div class="surface-card destinatarios-list">
+        @for (linha of linhas(); track linha.cliente.id) {
+          <div class="destinatarios-row">
+            <span class="destinatarios-cliente">{{ linha.cliente.nome }}</span>
+            <mat-form-field appearance="outline" class="destinatarios-field">
+              <mat-label>Destinatários</mat-label>
+              <input matInput [(ngModel)]="linha.destinatarios" placeholder="nome@empresa.com, outro@empresa.com" />
+            </mat-form-field>
+            <button mat-stroked-button color="primary" [disabled]="linha.salvando" (click)="salvar(linha)">
+              @if (linha.salvando) {
+                Salvando…
+              } @else {
+                Salvar
+              }
+            </button>
+          </div>
+        }
+      </div>
+    }
+  </section>
+</div>

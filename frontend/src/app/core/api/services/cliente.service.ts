@@ -22,4 +22,10 @@ export class ClienteApiService {
   criar(dados: ClienteCreate): Observable<ClienteRead> {
     return this.http.post<ClienteRead>(this.baseUrl, dados);
   }
+
+  atualizarDestinatarios(clienteId: string, destinatariosRelatorio: string): Observable<ClienteRead> {
+    return this.http.patch<ClienteRead>(`${this.baseUrl}/${clienteId}/destinatarios`, {
+      destinatarios_relatorio: destinatariosRelatorio,
+    });
+  }
 }

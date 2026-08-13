@@ -18,3 +18,10 @@ class ClienteService:
 
     async def listar(self) -> list[Cliente]:
         return await self._repo.listar()
+
+    async def atualizar_destinatarios(self, cliente_id: uuid.UUID, destinatarios_relatorio: str) -> Cliente | None:
+        cliente = await self._repo.obter(cliente_id)
+        if cliente is None:
+            return None
+        cliente.destinatarios_relatorio = destinatarios_relatorio
+        return await self._repo.atualizar(cliente)

@@ -1,0 +1,81 @@
+.search-field {
+  max-width: 360px;
+}
+
+.processo-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-5);
+  text-decoration: none;
+  color: var(--color-text);
+}
+
+.processo-card-cliente {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-tertiary);
+}
+
+.processo-card-name {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.processo-card-status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-1);
+}
+
+.processo-card-footer {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  margin-top: auto;
+  padding-top: var(--space-2);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-tertiary);
+}
+
+.processo-card-footer mat-icon {
+  width: 16px;
+  height: 16px;
+  font-size: 16px;
+  transform: translateX(-2px);
+  transition: transform 0.18s var(--ease-standard);
+}
+
+.processo-card:hover .processo-card-footer {
+  color: var(--color-brand);
+}
+
+.processo-card:hover .processo-card-footer mat-icon {
+  transform: translateX(0);
+}
+
+.skeleton-card {
+  height: 132px;
+  background: linear-gradient(
+    90deg,
+    var(--color-surface-sunken) 25%,
+    #e9ebee 37%,
+    var(--color-surface-sunken) 63%
+  );
+  background-size: 400% 100%;
+  animation: skeleton-loading 1.4s ease infinite;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0 50%;
+  }
+}

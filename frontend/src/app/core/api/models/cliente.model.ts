@@ -7,5 +7,6 @@ export interface ClienteRead {
   id: string;
   nome: string;
   pasta_sharepoint_id: string;
+  destinatarios_relatorio: string;
   criado_em: string;
 }

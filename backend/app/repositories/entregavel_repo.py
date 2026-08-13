@@ -4,7 +4,7 @@ from datetime import datetime
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from app.domain.models import Entregavel, JobGeracao, StatusJob
+from app.domain.models import Cliente, Entregavel, JobGeracao, Processo, StatusJob, TipoEntregavel
 
 
 class EntregavelRepository:
@@ -30,6 +30,24 @@ class EntregavelRepository:
         consulta = select(Entregavel).where(Entregavel.processo_id == processo_id).order_by(Entregavel.gerado_em)
         resultado = await self._session.exec(consulta)
         return list(resultado.all())
+
+    async def listar_historico(
+        self, cliente_id: uuid.UUID | None = None, tipo: TipoEntregavel | None = None
+    ) -> list[tuple[Entregavel, Processo, Cliente, JobGeracao | None]]:
+        consulta = (
+            select(Entregavel, Processo, Cliente, JobGeracao)
+            .join(Processo, Processo.id == Entregavel.processo_id)
+            .join(Cliente, Cliente.id == Processo.cliente_id)
+            .join(JobGeracao, JobGeracao.entregavel_id == Entregavel.id, isouter=True)
+        )
+        if cliente_id is not None:
+            consulta = consulta.where(Processo.cliente_id == cliente_id)
+        if tipo is not None:
+            consulta = consulta.where(Entregavel.tipo == tipo)
+        consulta = consulta.order_by(Entregavel.gerado_em.desc().nullslast())
+
+        resultado = await self._session.exec(consulta)  # type: ignore[call-overload]
+        return [tuple(linha) for linha in resultado.all()]
 
     async def criar_job(self, job: JobGeracao) -> JobGeracao:
         self._session.add(job)

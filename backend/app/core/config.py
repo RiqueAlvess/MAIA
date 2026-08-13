@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     ms_graph_client_id: str = ""
     ms_graph_client_secret: str = ""
     ms_graph_site_id: str = ""
+    ms_graph_sender_upn: str = ""
 
     entra_tenant_id: str = ""
     entra_audience: str = ""
@@ -40,6 +41,10 @@ class Settings(BaseSettings):
     @property
     def auth_configurado(self) -> bool:
         return bool(self.entra_tenant_id and self.entra_audience)
+
+    @property
+    def email_configurado(self) -> bool:
+        return self.graph_configurado and bool(self.ms_graph_sender_upn)
 
 
 @lru_cache

@@ -75,6 +75,16 @@ SUFIXOS_ARQUIVO: dict[TipoEntregavel, str] = {
     TipoEntregavel.pauta: "Pauta",
 }
 
+ROTULOS_ENTREGAVEL: dict[TipoEntregavel, str] = {
+    TipoEntregavel.word_as_is: "AS IS",
+    TipoEntregavel.excel_gaps: "Gaps",
+    TipoEntregavel.to_be: "TO BE",
+    TipoEntregavel.raci: "Matriz RACI",
+    TipoEntregavel.dashboard: "Dashboard de Maturidade",
+    TipoEntregavel.status_semanal: "Status Semanal",
+    TipoEntregavel.pauta: "Pauta de Reunião",
+}
+
 MAX_DOCUMENTOS_CONTEXTO = 8
 MAX_CARACTERES_POR_DOCUMENTO = 3000
 

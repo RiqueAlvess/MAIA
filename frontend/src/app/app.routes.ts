@@ -24,9 +24,26 @@ export const appRoutes: Routes = [
           import('./features/processos/processos-list.component').then((m) => m.ProcessosListComponent),
       },
       {
+        path: 'processos',
+        loadComponent: () =>
+          import('./features/processos/processos-global-list.component').then(
+            (m) => m.ProcessosGlobalListComponent,
+          ),
+      },
+      {
         path: 'processos/:processoId/entregaveis',
         loadComponent: () =>
           import('./features/entregaveis/entregaveis-panel.component').then((m) => m.EntregaveisPanelComponent),
+      },
+      {
+        path: 'relatorios',
+        loadComponent: () =>
+          import('./features/relatorios/relatorios-list.component').then((m) => m.RelatoriosListComponent),
+      },
+      {
+        path: 'configuracoes',
+        loadComponent: () =>
+          import('./features/configuracoes/configuracoes.component').then((m) => m.ConfiguracoesComponent),
       },
     ],
   },

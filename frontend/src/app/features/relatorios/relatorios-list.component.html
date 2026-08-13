@@ -1,0 +1,76 @@
+<div class="page">
+  <div class="page-heading">
+    <div>
+      <h1>Relatórios</h1>
+      <p>Histórico consolidado de todos os entregáveis já gerados, em todos os clientes.</p>
+    </div>
+  </div>
+
+  <div class="filters surface-card">
+    <mat-form-field appearance="outline" class="filter-field">
+      <mat-label>Cliente</mat-label>
+      <mat-select [(ngModel)]="clienteIdFiltro" (selectionChange)="carregar()">
+        <mat-option [value]="null">Todos os clientes</mat-option>
+        @for (cliente of clientes(); track cliente.id) {
+          <mat-option [value]="cliente.id">{{ cliente.nome }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="filter-field">
+      <mat-label>Tipo de entregável</mat-label>
+      <mat-select [(ngModel)]="tipoFiltro" (selectionChange)="carregar()">
+        <mat-option [value]="null">Todos os tipos</mat-option>
+        @for (item of tipos; track item.tipo) {
+          <mat-option [value]="item.tipo">{{ item.rotulo }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <button
+      mat-flat-button
+      color="primary"
+      class="filter-action"
+      [disabled]="!clienteSelecionado()"
+      (click)="abrirEnvioEmail()"
+    >
+      <mat-icon>mail</mat-icon>
+      Enviar por e-mail
+    </button>
+  </div>
+
+  @if (carregando()) {
+    <div class="surface-card skeleton-table"></div>
+  } @else if (historico().length === 0) {
+    <div class="empty-state">
+      <mat-icon>summarize</mat-icon>
+      <h3>Nenhum entregável gerado ainda</h3>
+      <p>Assim que um entregável for gerado em qualquer processo, ele aparece aqui.</p>
+    </div>
+  } @else {
+    <div class="surface-card history-table">
+      <div class="history-row history-row--header">
+        <span>Cliente</span>
+        <span>Processo</span>
+        <span>Entregável</span>
+        <span>Status</span>
+        <span>Gerado em</span>
+      </div>
+      @for (item of historico(); track item.id) {
+        <div class="history-row">
+          <span>{{ item.cliente_nome }}</span>
+          <span>{{ item.processo_nome }}</span>
+          <span>{{ rotuloTipo(item.tipo) }}</span>
+          <span>
+            @if (item.status) {
+              <span class="status-chip" [ngClass]="statusChipClass(item.status)">{{ formatarStatus(item.status) }}</span>
+            } @else {
+              <span class="status-chip status-chip--neutral">Sem execução</span>
+            }
+          </span>
+          <span>{{ item.gerado_em ? (item.gerado_em | date: 'dd/MM/yyyy HH:mm') : '—' }}</span>
+        </div>
+      }
+    </div>
+  }
+</div>
