@@ -50,7 +50,17 @@ Para habilitar as integrações:
 
 Em produção, não mantenha valores reais em disco: use um gerenciador de segredos (Azure Key Vault, GitHub Actions secrets ou equivalente) e injete-os como variáveis de ambiente do container.
 
-A aplicação funciona sem os segredos configurados até o momento de uso: sem `ANTHROPIC_API_KEY`, o endpoint de geração retorna erro explícito; sem `ENTRA_TENANT_ID`/`ENTRA_AUDIENCE`, as rotas autenticadas retornam `503`. Isso permite subir o ambiente e validar o restante do sistema antes de obter todas as credenciais.
+### Comportamento sem credenciais configuradas
+
+A aplicação foi pensada para subir e ser navegável antes de qualquer credencial existir:
+
+- **`ANTHROPIC_API_KEY`** ausente — a geração de entregáveis retorna erro explícito só quando acionada; o resto da aplicação funciona normalmente.
+- **`MS_GRAPH_*`** ausente — mesma lógica: só falha quando um entregável tenta ser salvo no SharePoint.
+- **Login (Entra ID)** — controlado por `ENVIRONMENT` (`backend/.env`, padrão `development`):
+  - `ENVIRONMENT=development` (padrão) **e** `ENTRA_TENANT_ID`/`ENTRA_AUDIENCE` ausentes → a API libera as rotas sem exigir token, e o frontend não tenta redirecionar para o login da Microsoft (isso é o que faz `docker compose up` funcionar sem nenhum `.env`). Basta não preencher `auth.clientId`/`auth.tenantId` em `frontend/src/environments/environment.ts`.
+  - `ENVIRONMENT=production` → o backend **exige** `ENTRA_TENANT_ID`/`ENTRA_AUDIENCE` configurados (responde `503` até serem definidos) e passa a validar token em toda rota. Configure também `auth.clientId`/`auth.tenantId` no frontend para o login funcionar — sem isso a build de produção também bloqueia a navegação.
+
+Ou seja: em desenvolvimento a ausência de credenciais é ignorada; em produção ela é obrigatória.
 
 ## Como rodar
 

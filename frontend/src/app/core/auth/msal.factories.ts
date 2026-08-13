@@ -11,6 +11,7 @@ import {
 } from '@azure/msal-browser';
 
 import { environment } from '../../../environments/environment';
+import { authConfigured } from './auth-mode';
 
 export function msalInstanceFactory(): IPublicClientApplication {
   return new PublicClientApplication({
@@ -44,7 +45,12 @@ export function msalGuardConfigFactory(): MsalGuardConfiguration {
 
 export function msalInterceptorConfigFactory(): MsalInterceptorConfiguration {
   const protectedResourceMap = new Map<string, Array<string>>();
-  protectedResourceMap.set(environment.apiUrl, environment.auth.scopes);
+
+  // Mapa vazio quando não configurado: o interceptor nunca tenta adquirir
+  // token nem redirecionar para login em nenhuma chamada à API.
+  if (authConfigured) {
+    protectedResourceMap.set(environment.apiUrl, environment.auth.scopes);
+  }
 
   return {
     interactionType: InteractionType.Redirect,

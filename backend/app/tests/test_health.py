@@ -11,8 +11,9 @@ def test_health_check_returns_ok() -> None:
     assert resposta.json() == {"status": "ok"}
 
 
-def test_clientes_endpoint_requires_authentication() -> None:
+def test_clientes_endpoint_funciona_sem_token_quando_auth_nao_configurada() -> None:
     with TestClient(app) as client:
         resposta = client.get("/api/v1/clientes")
 
-    assert resposta.status_code == 401
+    assert resposta.status_code == 200
+    assert resposta.json() == []

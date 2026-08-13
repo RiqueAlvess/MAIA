@@ -28,14 +28,23 @@ def _decode_token(token: str, settings: Settings) -> dict:
     )
 
 
+DEV_USER = {"sub": "dev-local", "name": "Modo desenvolvimento", "dev_mode": True}
+
+
 async def get_current_user(
     credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(bearer_scheme)],
     settings: Annotated[Settings, Depends(get_settings)],
 ) -> dict:
+    if not settings.auth_configurado:
+        if settings.environment == "production":
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail="Autenticação não configurada (ENTRA_TENANT_ID/ENTRA_AUDIENCE obrigatórios em produção)",
+            )
+        return DEV_USER
+
     if credentials is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token de acesso ausente")
-    if not settings.auth_configurado:
-        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Autenticação não configurada")
     try:
         return _decode_token(credentials.credentials, settings)
     except jwt.PyJWTError as exc:
