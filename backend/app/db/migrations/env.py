@@ -6,7 +6,7 @@ from sqlalchemy import pool
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlmodel import SQLModel
 
-from app.core.config import get_settings
+from app.core.config import garantir_diretorio_sqlite, get_settings
 from app.domain import models  # noqa: F401 - registra as tabelas em SQLModel.metadata
 
 config = context.config
@@ -17,6 +17,7 @@ if config.config_file_name is not None:
 target_metadata = SQLModel.metadata
 
 settings = get_settings()
+garantir_diretorio_sqlite(settings.database_url)
 config.set_main_option("sqlalchemy.url", settings.database_url)
 
 

@@ -10,7 +10,7 @@ backend/**/__pycache__/
 backend/*.egg-info/
 backend/.pytest_cache/
 backend/.ruff_cache/
-backend/db.sqlite3
+backend/data/
 
 # Frontend
 frontend/node_modules/

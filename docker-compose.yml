@@ -1,32 +1,16 @@
 services:
-  db:
-    image: postgres:16-alpine
-    environment:
-      POSTGRES_DB: maia
-      POSTGRES_USER: maia
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?defina POSTGRES_PASSWORD no arquivo .env}
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U maia -d maia"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-
   backend:
     build: ./backend
-    env_file: ./backend/.env
+    env_file:
+      - path: ./backend/.env
+        required: false
     environment:
-      DATABASE_URL: postgresql+asyncpg://maia:${POSTGRES_PASSWORD:?defina POSTGRES_PASSWORD no arquivo .env}@db:5432/maia
-    depends_on:
-      db:
-        condition: service_healthy
+      DATABASE_URL: sqlite+aiosqlite:///./data/maia.db
     ports:
       - "8000:8000"
     volumes:
       - ./backend/app:/app/app
+      - sqlite_data:/app/data
 
   frontend:
     build: ./frontend
@@ -36,4 +20,4 @@ services:
       - "4200:80"
 
 volumes:
-  pgdata:
+  sqlite_data:

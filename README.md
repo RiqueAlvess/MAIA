@@ -5,7 +5,7 @@ Plataforma para condução de mapeamento de processos: cadastro de clientes e pr
 ## Arquitetura
 
 ```
-Angular (SPA)  →  FastAPI (API + auth)  →  PostgreSQL (clientes, processos, docs, jobs)
+Angular (SPA)  →  FastAPI (API + auth)  →  SQLite (clientes, processos, docs, jobs)
                                          →  Microsoft Graph API (SharePoint/OneDrive)
                                          →  Claude API (geração de conteúdo, via BackgroundTasks)
 ```
@@ -14,7 +14,7 @@ Angular (SPA)  →  FastAPI (API + auth)  →  PostgreSQL (clientes, processos, 
 |---|---|
 | Frontend | Angular 17 (standalone components) + Angular Material |
 | Backend | FastAPI + Pydantic v2 + SQLModel (async) |
-| Banco | PostgreSQL |
+| Banco | SQLite (arquivo local, sem serviço externo) |
 | Storage de arquivos | Microsoft Graph API (`httpx` + `MSAL`, autenticação app-only) |
 | Geração de conteúdo | Claude API (Anthropic) |
 | Autenticação | Microsoft Entra ID (SSO delegado para usuários do painel; client credentials para o backend acessar o Graph) |
@@ -35,19 +35,18 @@ Ver `backend/app/` para a estrutura interna (`api/`, `services/`, `providers/`, 
 
 ## Configuração de credenciais
 
-Nenhuma credencial fica no código-fonte. Todos os segredos são lidos de variáveis de ambiente, carregadas a partir de arquivos `.env` que **não são versionados** (listados em `.gitignore`).
+Nenhuma credencial fica no código-fonte. Todos os segredos são lidos de variáveis de ambiente, carregadas de `backend/.env` — um arquivo **não versionado** (listado em `.gitignore`) e **opcional**: sem ele, o backend sobe normalmente com um banco SQLite local e a geração de entregáveis desabilitada até a chave da IA ser configurada.
 
-1. Copie os templates:
+Para habilitar as integrações:
+1. Copie o template:
    ```bash
-   cp .env.example .env
    cp backend/.env.example backend/.env
    ```
-2. Preencha `.env` (raiz) com a senha do Postgres.
-3. Preencha `backend/.env` com:
+2. Preencha `backend/.env` com:
    - `ANTHROPIC_API_KEY` — chave da API Claude (console.anthropic.com).
    - `MS_GRAPH_TENANT_ID`, `MS_GRAPH_CLIENT_ID`, `MS_GRAPH_CLIENT_SECRET`, `MS_GRAPH_SITE_ID` — credenciais de aplicativo (client credentials) registradas no Entra ID com permissão `Sites.ReadWrite.All` (app-only) sobre o site do SharePoint.
    - `ENTRA_TENANT_ID`, `ENTRA_AUDIENCE` — validação de token dos usuários do painel (App Registration do frontend).
-4. Preencha `frontend/src/environments/environment.ts` (`auth.clientId`, `auth.tenantId`) com os dados da App Registration do frontend.
+3. Preencha `frontend/src/environments/environment.ts` (`auth.clientId`, `auth.tenantId`) com os dados da App Registration do frontend.
 
 Em produção, não mantenha valores reais em disco: use um gerenciador de segredos (Azure Key Vault, GitHub Actions secrets ou equivalente) e injete-os como variáveis de ambiente do container.
 
@@ -57,12 +56,23 @@ A aplicação funciona sem os segredos configurados até o momento de uso: sem `
 
 ### Com Docker (recomendado)
 
+Um único comando sobe tudo — sem necessidade de instalar Python, Node ou de criar o arquivo `.env` antes:
+
 ```bash
 docker compose up --build
 ```
 
+O que acontece automaticamente:
+- As dependências de Python e de Node são instaladas dentro da imagem de cada serviço no `--build` (nada é instalado na máquina host).
+- O container do backend aplica as migrations (`alembic upgrade head`) antes de subir a API, criando o banco SQLite na primeira execução.
+- O banco fica em um volume Docker próprio (`sqlite_data`), então os dados persistem entre reinícios (`docker compose down` sem `-v`) mesmo sem `.env`.
+- O código do backend (`backend/app`) é montado como volume e o servidor roda com `--reload`, então alterações no host refletem no container automaticamente.
+- O frontend já sobe compilado e servido por nginx, com `/api` já roteado para o backend (`nginx.conf`) — não é preciso configurar URLs manualmente.
+
 - Backend: http://localhost:8000 (`/health`, `/docs`)
 - Frontend: http://localhost:4200
+
+Para reconstruir as imagens após mudar dependências (`requirements.txt` ou `package.json`), rode `docker compose up --build` novamente.
 
 ### Sem Docker
 
@@ -71,7 +81,6 @@ Backend:
 cd backend
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-export $(cat .env | grep -v '^#' | xargs)   # ou configure as variáveis manualmente
 alembic upgrade head
 uvicorn app.main:app --reload
 ```

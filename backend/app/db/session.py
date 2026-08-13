@@ -2,10 +2,13 @@ from collections.abc import AsyncGenerator
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
-from app.core.config import get_settings
+from app.core.config import garantir_diretorio_sqlite, get_settings
 
 settings = get_settings()
-engine = create_async_engine(settings.database_url, echo=False, pool_pre_ping=True)
+garantir_diretorio_sqlite(settings.database_url)
+
+connect_args = {"check_same_thread": False} if settings.database_url.startswith("sqlite") else {}
+engine = create_async_engine(settings.database_url, echo=False, pool_pre_ping=True, connect_args=connect_args)
 async_session_factory = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
 

@@ -20,7 +20,7 @@ depends_on: Union[str, Sequence[str], None] = None
 def upgrade() -> None:
     op.create_table(
         "clientes",
-        sa.Column("id", sqlmodel.sql.sqltypes.GUID(), nullable=False),
+        sa.Column("id", sa.Uuid(), nullable=False),
         sa.Column("nome", sqlmodel.sql.sqltypes.AutoString(length=200), nullable=False),
         sa.Column("pasta_sharepoint_id", sqlmodel.sql.sqltypes.AutoString(length=500), nullable=False),
         sa.Column("criado_em", sa.DateTime(), nullable=False),
@@ -30,8 +30,8 @@ def upgrade() -> None:
 
     op.create_table(
         "processos",
-        sa.Column("id", sqlmodel.sql.sqltypes.GUID(), nullable=False),
-        sa.Column("cliente_id", sqlmodel.sql.sqltypes.GUID(), nullable=False),
+        sa.Column("id", sa.Uuid(), nullable=False),
+        sa.Column("cliente_id", sa.Uuid(), nullable=False),
         sa.Column("nome", sqlmodel.sql.sqltypes.AutoString(length=200), nullable=False),
         sa.Column("status_as_is", sqlmodel.sql.sqltypes.AutoString(length=50), nullable=False),
         sa.Column("status_to_be", sqlmodel.sql.sqltypes.AutoString(length=50), nullable=False),
@@ -43,8 +43,8 @@ def upgrade() -> None:
 
     op.create_table(
         "documentos",
-        sa.Column("id", sqlmodel.sql.sqltypes.GUID(), nullable=False),
-        sa.Column("processo_id", sqlmodel.sql.sqltypes.GUID(), nullable=False),
+        sa.Column("id", sa.Uuid(), nullable=False),
+        sa.Column("processo_id", sa.Uuid(), nullable=False),
         sa.Column("nome", sqlmodel.sql.sqltypes.AutoString(length=300), nullable=False),
         sa.Column("graph_item_id", sqlmodel.sql.sqltypes.AutoString(length=500), nullable=False),
         sa.Column("camada", sa.Enum("bronze", "as_is", "to_be", name="camadadocumento"), nullable=False),
@@ -57,8 +57,8 @@ def upgrade() -> None:
 
     op.create_table(
         "entregaveis",
-        sa.Column("id", sqlmodel.sql.sqltypes.GUID(), nullable=False),
-        sa.Column("processo_id", sqlmodel.sql.sqltypes.GUID(), nullable=False),
+        sa.Column("id", sa.Uuid(), nullable=False),
+        sa.Column("processo_id", sa.Uuid(), nullable=False),
         sa.Column(
             "tipo",
             sa.Enum(
@@ -82,8 +82,8 @@ def upgrade() -> None:
 
     op.create_table(
         "jobs_geracao",
-        sa.Column("id", sqlmodel.sql.sqltypes.GUID(), nullable=False),
-        sa.Column("entregavel_id", sqlmodel.sql.sqltypes.GUID(), nullable=False),
+        sa.Column("id", sa.Uuid(), nullable=False),
+        sa.Column("entregavel_id", sa.Uuid(), nullable=False),
         sa.Column(
             "status",
             sa.Enum("pendente", "processando", "concluido", "erro", name="statusjob"),

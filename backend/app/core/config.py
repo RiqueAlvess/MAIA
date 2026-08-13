@@ -1,4 +1,5 @@
 from functools import lru_cache
+from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -8,7 +9,7 @@ class Settings(BaseSettings):
 
     environment: str = "development"
 
-    database_url: str = "postgresql+asyncpg://maia:maia@localhost:5432/maia"
+    database_url: str = "sqlite+aiosqlite:///./data/maia.db"
 
     anthropic_api_key: str = ""
     anthropic_model: str = "claude-sonnet-5"
@@ -44,3 +45,12 @@ class Settings(BaseSettings):
 @lru_cache
 def get_settings() -> Settings:
     return Settings()
+
+
+def garantir_diretorio_sqlite(database_url: str) -> None:
+    """Cria o diretório do arquivo .db se a URL apontar para um banco SQLite local."""
+    if not database_url.startswith("sqlite"):
+        return
+    caminho_arquivo = database_url.split("///", 1)[-1]
+    if caminho_arquivo and caminho_arquivo != ":memory:":
+        Path(caminho_arquivo).parent.mkdir(parents=True, exist_ok=True)
