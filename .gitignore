@@ -1,0 +1,25 @@
+# Segredos
+.env
+backend/.env
+frontend/src/environments/environment.local.ts
+
+# Backend
+backend/.venv/
+backend/__pycache__/
+backend/**/__pycache__/
+backend/*.egg-info/
+backend/.pytest_cache/
+backend/.ruff_cache/
+backend/db.sqlite3
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+frontend/coverage/
+npm-debug.log*
+
+# Editores e SO
+.vscode/
+.idea/
+.DS_Store

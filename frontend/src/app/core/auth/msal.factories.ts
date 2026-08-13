@@ -1,0 +1,53 @@
+import {
+  MsalGuardConfiguration,
+  MsalInterceptorConfiguration,
+} from '@azure/msal-angular';
+import {
+  BrowserCacheLocation,
+  InteractionType,
+  IPublicClientApplication,
+  LogLevel,
+  PublicClientApplication,
+} from '@azure/msal-browser';
+
+import { environment } from '../../../environments/environment';
+
+export function msalInstanceFactory(): IPublicClientApplication {
+  return new PublicClientApplication({
+    auth: {
+      clientId: environment.auth.clientId,
+      authority: `https://login.microsoftonline.com/${environment.auth.tenantId}`,
+      redirectUri: environment.auth.redirectUri,
+    },
+    cache: {
+      cacheLocation: BrowserCacheLocation.LocalStorage,
+      storeAuthStateInCookie: false,
+    },
+    system: {
+      loggerOptions: {
+        loggerCallback: () => {},
+        logLevel: LogLevel.Warning,
+        piiLoggingEnabled: false,
+      },
+    },
+  });
+}
+
+export function msalGuardConfigFactory(): MsalGuardConfiguration {
+  return {
+    interactionType: InteractionType.Redirect,
+    authRequest: {
+      scopes: environment.auth.scopes,
+    },
+  };
+}
+
+export function msalInterceptorConfigFactory(): MsalInterceptorConfiguration {
+  const protectedResourceMap = new Map<string, Array<string>>();
+  protectedResourceMap.set(environment.apiUrl, environment.auth.scopes);
+
+  return {
+    interactionType: InteractionType.Redirect,
+    protectedResourceMap,
+  };
+}

@@ -1,0 +1,29 @@
+<div class="maia-page">
+  <h1>Central de Entregáveis</h1>
+
+  <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px">
+    @for (item of tipos; track item.tipo) {
+      <mat-card>
+        <mat-card-title>{{ item.rotulo }}</mat-card-title>
+        <mat-card-content>
+          @if (jobDoTipo(item.tipo); as job) {
+            <mat-chip-set>
+              <mat-chip>{{ job.status }}</mat-chip>
+            </mat-chip-set>
+            @if (emAndamento(item.tipo)) {
+              <mat-progress-bar mode="indeterminate" style="margin-top: 8px"></mat-progress-bar>
+            }
+            @if (job.status === 'erro') {
+              <p style="color: #b3261e">{{ job.log }}</p>
+            }
+          }
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-flat-button color="primary" [disabled]="emAndamento(item.tipo)" (click)="gerar(item.tipo)">
+            Gerar
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    }
+  </div>
+</div>
