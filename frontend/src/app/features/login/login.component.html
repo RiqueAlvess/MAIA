@@ -1,0 +1,58 @@
+<div class="login-screen">
+  <div class="login-card surface-card">
+    <div class="login-brand">
+      <span class="brand-mark">
+        <span class="dot dot--sm"></span>
+        <span class="dot dot--md"></span>
+        <span class="dot dot--lg"></span>
+      </span>
+      <div class="brand-text">
+        <strong>MAIA</strong>
+        <span>LG Consult</span>
+      </div>
+    </div>
+
+    <h1>Bem-vindo</h1>
+    <p class="login-subtitle">Mapeamento Assistido por IA. Entre com sua conta corporativa para continuar.</p>
+
+    @if (authConfigured) {
+      @if (verificando()) {
+        <div class="login-checking">
+          <span class="spinner"></span>
+          Verificando sessão…
+        </div>
+      } @else {
+        <button
+          mat-flat-button
+          color="primary"
+          class="microsoft-button"
+          [disabled]="entrando()"
+          (click)="entrarComMicrosoft()"
+        >
+          <span class="ms-logo" aria-hidden="true">
+            <span class="ms-logo-square ms-logo-square--red"></span>
+            <span class="ms-logo-square ms-logo-square--green"></span>
+            <span class="ms-logo-square ms-logo-square--blue"></span>
+            <span class="ms-logo-square ms-logo-square--yellow"></span>
+          </span>
+          {{ entrando() ? 'Redirecionando…' : 'Continuar com a Microsoft' }}
+        </button>
+
+        @if (erro()) {
+          <p class="login-error">{{ erro() }}</p>
+        }
+
+        <p class="login-hint">
+          O acesso é restrito a contas autorizadas pela LG Consult. Se sua conta não tiver permissão, a própria
+          Microsoft bloqueia o login.
+        </p>
+      }
+    } @else {
+      <div class="login-dev">
+        <mat-icon>construction</mat-icon>
+        <p>Autenticação ainda não configurada neste ambiente — modo desenvolvimento.</p>
+        <button mat-stroked-button color="primary" (click)="continuarSemLogin()">Continuar</button>
+      </div>
+    }
+  </div>
+</div>

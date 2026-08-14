@@ -18,8 +18,7 @@ class Settings(BaseSettings):
     ms_graph_tenant_id: str = ""
     ms_graph_client_id: str = ""
     ms_graph_client_secret: str = ""
-    ms_graph_site_id: str = ""
-    ms_graph_sender_upn: str = ""
+    ms_graph_group_id: str = ""
 
     entra_tenant_id: str = ""
     entra_audience: str = ""
@@ -36,7 +35,12 @@ class Settings(BaseSettings):
 
     @property
     def graph_configurado(self) -> bool:
-        return bool(self.ms_graph_tenant_id and self.ms_graph_client_id and self.ms_graph_client_secret)
+        return bool(
+            self.ms_graph_tenant_id
+            and self.ms_graph_client_id
+            and self.ms_graph_client_secret
+            and self.ms_graph_group_id
+        )
 
     @property
     def auth_configurado(self) -> bool:
@@ -44,7 +48,9 @@ class Settings(BaseSettings):
 
     @property
     def email_configurado(self) -> bool:
-        return self.graph_configurado and bool(self.ms_graph_sender_upn)
+        # Envio delegado (/me/sendMail): não depende de uma caixa remetente
+        # fixa, só do Graph estar configurado e do usuário estar autenticado.
+        return self.graph_configurado
 
 
 @lru_cache

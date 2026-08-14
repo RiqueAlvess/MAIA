@@ -1,0 +1,195 @@
+:host {
+  display: block;
+  height: 100vh;
+}
+
+.login-screen {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6);
+  background:
+    radial-gradient(circle at 15% 15%, rgba(37, 99, 235, 0.12), transparent 45%),
+    radial-gradient(circle at 85% 85%, rgba(37, 99, 235, 0.08), transparent 45%),
+    var(--color-bg);
+}
+
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  padding: var(--space-8) var(--space-6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-2);
+  box-shadow: var(--shadow-lg);
+}
+
+.login-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.brand-mark {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 3px;
+}
+
+.dot {
+  border-radius: 50%;
+  display: block;
+}
+
+.dot--sm {
+  width: 7px;
+  height: 7px;
+  background: #e11d48;
+}
+
+.dot--md {
+  width: 11px;
+  height: 11px;
+  background: #f59e0b;
+}
+
+.dot--lg {
+  width: 19px;
+  height: 19px;
+  background: var(--color-brand);
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.15;
+}
+
+.brand-text strong {
+  font-size: 21px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--color-text);
+}
+
+.brand-text span {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+}
+
+h1 {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.login-subtitle {
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: var(--space-6);
+}
+
+.microsoft-button {
+  width: 100%;
+  height: 46px !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  font-size: 14px !important;
+}
+
+.ms-logo {
+  display: grid;
+  grid-template-columns: repeat(2, 8px);
+  grid-template-rows: repeat(2, 8px);
+  gap: 1px;
+  flex-shrink: 0;
+}
+
+.ms-logo-square {
+  display: block;
+}
+
+.ms-logo-square--red {
+  background: #f25022;
+}
+
+.ms-logo-square--green {
+  background: #7fba00;
+}
+
+.ms-logo-square--blue {
+  background: #00a4ef;
+}
+
+.ms-logo-square--yellow {
+  background: #ffb900;
+}
+
+.login-error {
+  margin: var(--space-3) 0 0;
+  padding: var(--space-3);
+  width: 100%;
+  border-radius: var(--radius-sm);
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+  font-size: 13px;
+}
+
+.login-hint {
+  margin-top: var(--space-5);
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+  line-height: 1.5;
+}
+
+.login-checking {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  padding: var(--space-4) 0;
+}
+
+.spinner {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--color-border-strong);
+  border-top-color: var(--color-brand);
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.login-dev {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding-top: var(--space-2);
+}
+
+.login-dev mat-icon {
+  color: var(--color-warning);
+}
+
+.login-dev p {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}

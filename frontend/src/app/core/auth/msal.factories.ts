@@ -1,7 +1,4 @@
-import {
-  MsalGuardConfiguration,
-  MsalInterceptorConfiguration,
-} from '@azure/msal-angular';
+import { MsalInterceptorConfiguration } from '@azure/msal-angular';
 import {
   BrowserCacheLocation,
   InteractionType,
@@ -19,6 +16,7 @@ export function msalInstanceFactory(): IPublicClientApplication {
       clientId: environment.auth.clientId,
       authority: `https://login.microsoftonline.com/${environment.auth.tenantId}`,
       redirectUri: environment.auth.redirectUri,
+      postLogoutRedirectUri: '/login',
     },
     cache: {
       cacheLocation: BrowserCacheLocation.LocalStorage,
@@ -32,15 +30,6 @@ export function msalInstanceFactory(): IPublicClientApplication {
       },
     },
   });
-}
-
-export function msalGuardConfigFactory(): MsalGuardConfiguration {
-  return {
-    interactionType: InteractionType.Redirect,
-    authRequest: {
-      scopes: environment.auth.scopes,
-    },
-  };
 }
 
 export function msalInterceptorConfigFactory(): MsalInterceptorConfiguration {

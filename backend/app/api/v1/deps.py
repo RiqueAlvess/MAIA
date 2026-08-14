@@ -4,9 +4,11 @@ from fastapi import Depends
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from app.core.config import Settings, get_settings
+from app.core.security import get_bearer_token
 from app.db.session import get_session
 from app.providers.ai.claude_provider import ClaudeProvider
 from app.providers.email.graph_email import GraphEmailProvider
+from app.providers.graph_auth import GraphTokenClient
 from app.providers.storage.graph_storage import GraphStorageProvider
 from app.repositories.cliente_repo import ClienteRepository
 from app.repositories.documento_repo import DocumentoRepository
@@ -37,16 +39,28 @@ def get_entregavel_repo(session: SessionDep) -> EntregavelRepository:
     return EntregavelRepository(session)
 
 
-def get_storage_provider(settings: SettingsDep) -> GraphStorageProvider:
-    return GraphStorageProvider(settings)
+def get_graph_token_client(
+    settings: SettingsDep,
+    user_token: Annotated[str | None, Depends(get_bearer_token)],
+) -> GraphTokenClient:
+    return GraphTokenClient(settings, user_token)
+
+
+def get_storage_provider(
+    settings: SettingsDep,
+    token_client: Annotated[GraphTokenClient, Depends(get_graph_token_client)],
+) -> GraphStorageProvider:
+    return GraphStorageProvider(settings.ms_graph_group_id, token_client)
 
 
 def get_ai_provider(settings: SettingsDep) -> ClaudeProvider:
     return ClaudeProvider(settings)
 
 
-def get_email_provider(settings: SettingsDep) -> GraphEmailProvider:
-    return GraphEmailProvider(settings)
+def get_email_provider(
+    token_client: Annotated[GraphTokenClient, Depends(get_graph_token_client)],
+) -> GraphEmailProvider:
+    return GraphEmailProvider(token_client)
 
 
 def get_cliente_service(repo: Annotated[ClienteRepository, Depends(get_cliente_repo)]) -> ClienteService:

@@ -1,12 +1,16 @@
 import { Routes } from '@angular/router';
-import { MsalGuard } from '@azure/msal-angular';
 
-import { authConfigured } from './core/auth/auth-mode';
+import { authGuard } from './core/auth/auth.guard';
 
 export const appRoutes: Routes = [
   {
+    path: 'login',
+    loadComponent: () => import('./features/login/login.component').then((m) => m.LoginComponent),
+  },
+  {
     path: '',
-    canActivate: authConfigured ? [MsalGuard] : [],
+    loadComponent: () => import('./core/layout/app-shell.component').then((m) => m.AppShellComponent),
+    canActivate: [authGuard],
     children: [
       { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
       {

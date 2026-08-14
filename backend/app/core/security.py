@@ -49,3 +49,12 @@ async def get_current_user(
         return _decode_token(credentials.credentials, settings)
     except jwt.PyJWTError as exc:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token inválido") from exc
+
+
+async def get_bearer_token(
+    credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(bearer_scheme)],
+) -> str | None:
+    """Token bruto do usuário logado, usado no fluxo On-Behalf-Of para obter
+    acesso ao Microsoft Graph em nome dele. None em modo desenvolvimento
+    (sem login) — providers que dependem do Graph tratam essa ausência."""
+    return credentials.credentials if credentials else None
